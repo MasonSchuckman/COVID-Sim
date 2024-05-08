@@ -15,7 +15,7 @@ class Event:
 
 # Parameters for COVID-19, can be adjusted dynamically
 params = {
-    'beta': 2.5 / 14,  # Transmission rate
+    'beta': 2 / 14,  # Transmission rate
     'sigma': 1 / 5,    # Incubation period
     'gamma': 1 / 14,   # Infectious period
     'delta': 1 / 365,  # Loss of immunity

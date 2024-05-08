@@ -61,13 +61,13 @@ hospital_capacity = 2000  # Hospital capacity for serious cases
 
 events = [
     # Holidays
-    Event(100, 120, {'beta': 10 / 14}),
-    Event(300, 320, {'beta': 10 / 14}),
-    Event(500, 520, {'beta': 10 / 14}),
-    Event(700, 720, {'beta': 10 / 14}),
+    # Event(100, 120, {'beta': 10 / 14}),
+# Event(300, 320, {'beta': 10 / 14}),
+    # Event(500, 520, {'beta': 10 / 14}),
+    # Event(700, 720, {'beta': 10 / 14}),
 
 
-    Event(250, 500, {'gamma': 1 / 7})
+    #Event(250, 5000, {'gamma': 1 / 7})
 ]
 
 model = SEIRSModel(params, events, hospital_capacity)

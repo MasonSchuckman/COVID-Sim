@@ -6,7 +6,7 @@ from matplotlib.colors import Normalize
 from scipy.integrate import odeint
 import math
 
-INTERVAL_LENGTH = 2
+INTERVAL_LENGTH = 4
 
 
 
@@ -78,7 +78,7 @@ class County:
         self.s, self.e, self.i, self.r, self.d = y0
         self.population = np.sum(self.y0) - self.y0[4]
         self.params = params
-        self.travel = 0.3
+        self.travel = 0.1
         self.model = SEIRSModel(params, events, hospital_capacity)
 
     def update_status(self, t, adj_counties):
@@ -145,7 +145,7 @@ def random_params(i,j):
         'beta': 2/14,#np.random.uniform(1, dist**0.5 + 1) / 14,
         'sigma': 1 / 5,     # Incubation Period
         'gamma': 1 / 14,    # Sick Period
-        'delta': 1 / 90,   # Reinfection period
+        'delta': 1 / 220,   # Reinfection period
         'mu_base': 0.001 / 14,  # Base mortality rate per day                            
         'mu_factor': 0.05  # Additional mortality factor when over capacity
     } 

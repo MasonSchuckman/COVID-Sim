@@ -1,88 +1,54 @@
-import numpy as np
+import pandas as pd
 import matplotlib.pyplot as plt
-from matplotlib.patches import Circle
-from matplotlib.animation import FuncAnimation
 
-# Constants
-population_size = 800   # Total population size
-initial_infected = 3    # Initially infected people
-R = 1                   # Infection radius
-P = 0.5                 # Probability of infection
+# Load the data
+df = pd.read_csv('H:/downloads/US.csv')
 
-world_size = 20         # Size of the 2D world
-steps = 1000            # Number of simulation steps
+# Convert the 'date' column to datetime format
+df['date'] = pd.to_datetime(df['date'])
 
-# Status codes
-SUSCEPTIBLE = 0
-INFECTED = 1
-EXPOSED = 2
-RECOVERED = 3
+# Calculate the 7-day moving averages
+df['confirmed_7d_avg'] = df['new_confirmed'].rolling(window=7).mean()
+df['deceased_7d_avg'] = df['new_deceased'].rolling(window=7).mean()
+df['tested_7d_avg'] = df['new_tested'].rolling(window=7).mean()
+actual_data = df['confirmed_7d_avg']#.iloc[620:850].values
+dates = df['date']#.iloc[620:850].values
 
-# Constants for the SEIRS model to simulate COVID-19-like behavior
-exposure_period = 5     # Days until exposed individuals become infectious
-infection_period = 10   # Days infectious individuals remain so before recovery
-immunity_period = 90    # Days recovered individuals remain immune before possibly becoming susceptible again
+# actual_data = df['confirmed_7d_avg'].iloc[0:150].values
+# dates = df['date'].iloc[0:150].values
 
-# Initialize the positions randomly
-positions = np.random.uniform(0, world_size, (population_size, 2))
-velocities = np.random.uniform(-0.05, 0.05, (population_size, 2))  # Initial velocities
-status = np.array([SUSCEPTIBLE] * population_size)
-initially_infected_indices = np.random.choice(population_size, initial_infected, replace=False)
-status[initially_infected_indices] = INFECTED
+# Plotting
+fig, axes = plt.subplots(nrows=1, ncols=1, figsize=(10, 4))
+axes.plot(dates, actual_data, color='orange', label='7-Day Average')
+axes.set_title('7-Day Average of New Confirmed Cases')
+axes.set_xlabel('Date')
+axes.set_ylabel('Number of Cases')
+axes.legend()
 
-fig, ax = plt.subplots(figsize=(8, 8))
-scat = ax.scatter([], [], s=20)
-title_text = ax.set_title("Initializing Simulation...", fontsize=15)
+# # Plot new_confirmed cases and its 7-day average
+# #axes[0].plot(df['date'], df['new_confirmed'], marker='o', color='b', label='Daily Confirmed')
+# axes[0].plot(df['date'], df['confirmed_7d_avg'], color='orange', label='7-Day Average')
+# axes[0].set_title('New Confirmed Cases and 7-Day Average')
+# axes[0].set_xlabel('Date')
+# axes[0].set_ylabel('Number of Cases')
+# axes[0].legend()
 
-# Set plot limits and labels
-ax.set_xlim(0, world_size)
-ax.set_ylim(0, world_size)
-ax.grid(True)
+# # Plot new_deceased cases and its 7-day average
+# #axes[1].plot(df['date'], df['new_deceased'], marker='o', color='r', label='Daily Deceased')
+# axes[1].plot(df['date'], df['deceased_7d_avg'], color='purple', label='7-Day Average')
+# axes[1].set_title('New Deceased Cases and 7-Day Average')
+# axes[1].set_xlabel('Date')
+# axes[1].set_ylabel('Number of Cases')
+# axes[1].legend()
 
-infection_circles = []
+# # Plot new_tested cases and its 7-day average
+# #axes[2].plot(df['date'], df['new_tested'], marker='o', color='g', label='Daily Tested')
+# axes[2].plot(df['date'], df['tested_7d_avg'], color='cyan', label='7-Day Average')
+# axes[2].set_title('New Tested Cases and 7-Day Average')
+# axes[2].set_xlabel('Date')
+# axes[2].set_ylabel('Number of Cases')
+# axes[2].legend()
 
-def update(frame):
-    global positions, velocities, status, infection_circles
-
-    # Move individuals
-    positions += velocities
-    positions = np.clip(positions, 0, world_size)
-
-    # Update velocities slightly for random movement
-    velocities += np.random.uniform(-0.01, 0.01, velocities.shape)
-    velocities = np.clip(velocities, -0.05, 0.05)
-
-    new_infections = []
-    # Check for infections
-    for i in range(population_size):
-        if status[i] == INFECTED:
-            for j in range(population_size):
-                if i != j and status[j] == SUSCEPTIBLE:
-                    distance = np.linalg.norm(positions[i] - positions[j])
-                    if distance <= R and np.random.rand() < P:
-                        new_infections.append(j)
-                        circle = Circle(positions[i], 2, color='yellow', fill=False, linestyle='--')
-                        ax.add_patch(circle)
-                        infection_circles.append(circle)
-
-    # Update statuses
-    for i in new_infections:
-        status[i] = INFECTED
-
-    # Remove old circles
-    if frame % 10 == 0:
-        for circle in infection_circles:
-            circle.remove()
-        infection_circles = []
-
-    colors = ['blue' if x == SUSCEPTIBLE else 'red' for x in status]
-    scat.set_offsets(positions)
-    scat.set_color(colors)
-
-    title_text.set_text(f"Step {frame}")
-
-    return scat,
-
-ani = FuncAnimation(fig, update, frames=steps, interval=50, blit=False)
-
+# Improve layout and display the plots
+plt.tight_layout()
 plt.show()
